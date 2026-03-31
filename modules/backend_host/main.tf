@@ -105,7 +105,7 @@ resource "aws_instance" "this" {
   key_name                    = var.key_name
   vpc_security_group_ids      = [aws_security_group.ec2.id]
   iam_instance_profile        = aws_iam_instance_profile.ec2.name
-  associate_public_ip_address = false
+  associate_public_ip_address = true
   user_data_replace_on_change = true
 
   user_data = templatefile("${path.module}/user_data.sh.tftpl", {
