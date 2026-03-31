@@ -1,0 +1,49 @@
+aws_region = "ap-northeast-2"
+
+vpc_id               = "vpc-xxxxxxxx"
+alb_public_subnet_ids = ["subnet-aaaa", "subnet-bbbb"]
+ec2_public_subnet_id = "subnet-cccc"
+route53_zone_id      = "ZXXXXXXXXXXXX"
+
+domain_name = "kitschcatch.com"
+api_subdomain = "api"
+
+allowed_ssh_cidrs = ["203.0.113.10/32"]
+ec2_key_name      = "prod-kc-keypair"
+
+instance_type      = "t4g.small"
+health_check_path  = "/actuator/health"
+ssm_parameter_prefix = "/kitschcatch/prod-kc/backend"
+s3_bucket_name     = "kitschcatch-prod-kc-assets-replace-me"
+
+ssm_parameters = {
+  supabase_db_url = {
+    value       = "CHANGE_ME"
+    type        = "SecureString"
+    description = "Supabase PostgreSQL JDBC URL"
+  }
+  supabase_anon_key = {
+    value       = "CHANGE_ME"
+    type        = "SecureString"
+    description = "Supabase anon key"
+  }
+  supabase_service_role_key = {
+    value       = "CHANGE_ME"
+    type        = "SecureString"
+    description = "Supabase service role key"
+  }
+  spring_profile = {
+    value       = "prod"
+    type        = "String"
+    description = "Spring profile"
+  }
+  redis_password = {
+    value       = "CHANGE_ME"
+    type        = "SecureString"
+    description = "Redis password"
+  }
+}
+
+tags = {
+  Owner = "backend-team"
+}
