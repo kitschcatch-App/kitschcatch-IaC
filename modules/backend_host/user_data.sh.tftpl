@@ -57,6 +57,14 @@ server {
 }
 NGINX
 
-/usr/bin/docker compose -f /opt/kitschcatch/docker-compose.yml up -d || true
+attempt=0
+until /usr/bin/docker compose -f /opt/kitschcatch/docker-compose.yml up -d; do
+  attempt=$((attempt + 1))
+  if [ "$attempt" -ge 5 ]; then
+    echo "docker compose up failed after 5 attempts" >&2
+    exit 1
+  fi
+  sleep 10
+done
 
 ${user_data_extra}
