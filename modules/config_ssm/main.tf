@@ -3,8 +3,19 @@ data "aws_caller_identity" "current" {}
 data "aws_region" "current" {}
 
 locals {
-  normalized_prefix = startswith(var.parameter_prefix, "/") ? trimsuffix(var.parameter_prefix, "/") : "/${trimsuffix(var.parameter_prefix, "/")}"
-  parameter_arn     = "arn:aws:ssm:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:parameter${local.normalized_prefix}/*"
+  normalized_prefix       = startswith(var.parameter_prefix, "/") ? trimsuffix(var.parameter_prefix, "/") : "/${trimsuffix(var.parameter_prefix, "/")}"
+  parameter_arn           = "arn:aws:ssm:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:parameter${local.normalized_prefix}/*"
+  needs_kms_decrypt       = anytrue([for parameter in values(var.parameters) : lower(try(parameter.type, "SecureString")) == "securestring"])
+  use_default_ssm_kms_key = local.needs_kms_decrypt && length(var.kms_key_arns) == 0
+}
+
+data "aws_kms_alias" "ssm_default" {
+  count = local.use_default_ssm_kms_key ? 1 : 0
+  name  = "alias/aws/ssm"
+}
+
+locals {
+  effective_kms_key_arns = length(var.kms_key_arns) > 0 ? var.kms_key_arns : compact([try(data.aws_kms_alias.ssm_default[0].target_key_arn, null)])
 }
 
 resource "aws_ssm_parameter" "this" {
@@ -26,26 +37,35 @@ resource "aws_iam_policy" "ssm_read" {
 
   policy = jsonencode({
     Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Action = [
-          "ssm:GetParameter",
-          "ssm:GetParameters",
-          "ssm:GetParametersByPath"
-        ]
-        Resource = [
-          local.parameter_arn
-        ]
-      },
-      {
-        Effect = "Allow"
-        Action = [
-          "kms:Decrypt"
-        ]
-        Resource = "*"
-      }
-    ]
+    Statement = concat(
+      [
+        {
+          Effect = "Allow"
+          Action = [
+            "ssm:GetParameter",
+            "ssm:GetParameters",
+            "ssm:GetParametersByPath"
+          ]
+          Resource = [
+            local.parameter_arn
+          ]
+        }
+      ],
+      length(local.effective_kms_key_arns) > 0 ? [
+        {
+          Effect = "Allow"
+          Action = [
+            "kms:Decrypt"
+          ]
+          Resource = local.effective_kms_key_arns
+          Condition = {
+            StringEquals = {
+              "kms:ViaService" = "ssm.${data.aws_region.current.name}.amazonaws.com"
+            }
+          }
+        }
+      ] : []
+    )
   })
 
   tags = merge(var.tags, {

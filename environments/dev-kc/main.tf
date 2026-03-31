@@ -65,6 +65,7 @@ module "config_ssm" {
   parameter_prefix = var.ssm_parameter_prefix
   parameters       = var.ssm_parameters
   ec2_role_name    = module.backend_host.iam_role_name
+  kms_key_arns     = var.ssm_kms_key_arns
   tags             = local.common_tags
 }
 

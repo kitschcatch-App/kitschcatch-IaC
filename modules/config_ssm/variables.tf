@@ -22,6 +22,12 @@ variable "ec2_role_name" {
   type        = string
 }
 
+variable "kms_key_arns" {
+  description = "KMS key ARNs allowed for SecureString decryption (empty uses alias/aws/ssm)"
+  type        = list(string)
+  default     = []
+}
+
 variable "tags" {
   description = "Common tags"
   type        = map(string)

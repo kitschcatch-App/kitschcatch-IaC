@@ -86,6 +86,12 @@ variable "ssm_parameter_prefix" {
   default     = "/kitschcatch/dev-kc/backend"
 }
 
+variable "ssm_kms_key_arns" {
+  description = "KMS key ARNs for decrypting SecureString parameters"
+  type        = list(string)
+  default     = []
+}
+
 variable "s3_bucket_name" {
   description = "S3 bucket name for backend assets"
   type        = string
