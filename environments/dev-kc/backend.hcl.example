@@ -1,0 +1,5 @@
+bucket         = "kitschcatch-terraform-state-replace-me"
+key            = "environments/dev-kc/terraform.tfstate"
+region         = "ap-northeast-2"
+dynamodb_table = "kitschcatch-terraform-locks"
+encrypt        = true
