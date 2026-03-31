@@ -104,34 +104,6 @@ variable "ssm_parameters" {
     type        = optional(string, "SecureString")
     description = optional(string, "")
   }))
-
-  default = {
-    supabase_db_url = {
-      value       = "CHANGE_ME"
-      type        = "SecureString"
-      description = "Supabase PostgreSQL JDBC URL"
-    }
-    supabase_anon_key = {
-      value       = "CHANGE_ME"
-      type        = "SecureString"
-      description = "Supabase anon key"
-    }
-    supabase_service_role_key = {
-      value       = "CHANGE_ME"
-      type        = "SecureString"
-      description = "Supabase service role key"
-    }
-    spring_profile = {
-      value       = "prod"
-      type        = "String"
-      description = "Spring profile"
-    }
-    redis_password = {
-      value       = "CHANGE_ME"
-      type        = "SecureString"
-      description = "Redis password"
-    }
-  }
 }
 
 variable "user_data_extra" {

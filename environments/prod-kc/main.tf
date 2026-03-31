@@ -1,6 +1,7 @@
 locals {
   name_prefix = "${var.project_name}-${var.environment}"
   api_fqdn    = "${var.api_subdomain}.${var.domain_name}"
+  app_port    = 80
 
   common_tags = merge(
     {
@@ -36,7 +37,7 @@ module "edge_tls" {
   alb_subnet_ids          = module.network_inputs.alb_public_subnet_ids
   certificate_domain_name = local.api_fqdn
   route53_zone_id         = module.network_inputs.route53_zone_id
-  target_port             = 80
+  target_port             = local.app_port
   health_check_path       = var.health_check_path
   tags                    = local.common_tags
 }
@@ -52,7 +53,7 @@ module "backend_host" {
   key_name              = var.ec2_key_name
   allowed_ssh_cidrs     = var.allowed_ssh_cidrs
   alb_security_group_id = module.edge_tls.alb_security_group_id
-  app_port              = 80
+  app_port              = local.app_port
   app_s3_bucket_arns    = [module.storage.bucket_arn]
   user_data_extra       = var.user_data_extra
   tags                  = local.common_tags
@@ -72,7 +73,7 @@ module "config_ssm" {
 resource "aws_lb_target_group_attachment" "backend" {
   target_group_arn = module.edge_tls.target_group_arn
   target_id        = module.backend_host.instance_id
-  port             = 80
+  port             = local.app_port
 }
 
 resource "aws_route53_record" "api_alias" {
