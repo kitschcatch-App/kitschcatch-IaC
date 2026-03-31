@@ -1,0 +1,9 @@
+aws_region        = "ap-northeast-2"
+state_bucket_name = "kitschcatch-terraform-state-replace-me"
+lock_table_name   = "kitschcatch-terraform-locks"
+
+tags = {
+  Project     = "kitschcatch"
+  ManagedBy   = "terraform"
+  Environment = "shared"
+}
