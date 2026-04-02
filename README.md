@@ -26,6 +26,7 @@ Kitschcatch 백엔드 인프라(IaC) 저장소입니다.
 ```bash
 cd bootstrap/state-backend
 cp terraform.tfvars.example terraform.tfvars
+# terraform.tfvars에서 state_bucket_name, lock_table_name, tags를 실제 값으로 수정
 terraform init
 terraform plan
 terraform apply
@@ -37,6 +38,8 @@ terraform apply
 cd environments/dev-kc
 cp backend.hcl.example backend.hcl
 cp dev-kc.tfvars.example dev-kc.tfvars
+# backend.hcl에 bootstrap에서 생성한 bucket/dynamodb_table 값을 반영
+# dev-kc.tfvars에 VPC/Subnet/도메인/SSH CIDR/시크릿 값을 실제 환경 정보로 수정
 terraform init -backend-config=backend.hcl
 terraform plan -var-file=dev-kc.tfvars
 terraform apply -var-file=dev-kc.tfvars
